@@ -3,9 +3,9 @@ import "./App.css";
 
 function App() {
   return (
-    <main className="min-h-screen bg-gray-100">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <h1 className="text-lg font-bold text-gray-800">
+    <main className="w-full min-h-screen bg-gray-100">
+      <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
+        <h1 className="text-base md:text-lg font-bold text-gray-800">
           IoT Device Management
         </h1>
       </header>

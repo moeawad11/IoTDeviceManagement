@@ -1,10 +1,11 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
+ARG VITE_TENANT_ID=tenant-3
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN VITE_TENANT_ID=$VITE_TENANT_ID npm run build
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine AS production

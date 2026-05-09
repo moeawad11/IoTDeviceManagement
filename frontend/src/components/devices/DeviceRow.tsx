@@ -1,10 +1,5 @@
-import type { Device, DeviceStatus } from "../../types/device";
-
-const STATUS_STYLES: Record<DeviceStatus, string> = {
-  ONLINE: "bg-green-100 text-green-800",
-  OFFLINE: "bg-gray-100 text-gray-700",
-  ERROR: "bg-red-100 text-red-700",
-};
+import type { Device } from "../../types/device";
+import { STATUS_COLORS } from "../../constants";
 
 interface Props {
   device: Device;
@@ -20,23 +15,29 @@ export function DeviceRow({ device, onView, onDisable, isDisabling }: Props) {
 
   return (
     <tr className="border-b hover:bg-gray-50 transition-colors">
-      <td className="px-4 py-3 font-medium text-gray-900">{device.name}</td>
-      <td className="px-4 py-3 text-gray-600 font-mono text-sm">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 font-medium text-gray-900 text-xs sm:text-sm">
+        {device.name}
+      </td>
+      <td className="px-2 sm:px-6 py-2 sm:py-4 text-gray-600 font-mono text-xs sm:text-sm">
         {device.serialNumber}
       </td>
-      <td className="px-4 py-3 text-gray-600">{device.type}</td>
-      <td className="px-4 py-3">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 text-gray-600 text-xs sm:text-sm">
+        {device.type}
+      </td>
+      <td className="px-2 sm:px-6 py-2 sm:py-4">
         <span
-          className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_STYLES[device.status]}`}
+          className={`inline-block px-1.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold ${STATUS_COLORS[device.status]}`}
         >
           {device.status}
         </span>
       </td>
-      <td className="px-4 py-3 text-gray-500 text-sm">{lastSeen}</td>
-      <td className="px-4 py-3 flex gap-2">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 text-gray-500 text-xs sm:text-sm">
+        {lastSeen}
+      </td>
+      <td className="px-2 sm:px-6 py-2 sm:py-4 flex gap-1 sm:gap-2">
         <button
           onClick={() => onView(device)}
-          className="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 transition-colors"
+          className="text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-gray-300 hover:bg-gray-100 transition-colors"
           aria-label={`View device ${device.name}`}
         >
           View
@@ -44,7 +45,7 @@ export function DeviceRow({ device, onView, onDisable, isDisabling }: Props) {
         <button
           onClick={() => onDisable(device)}
           disabled={device.status === "OFFLINE" || isDisabling}
-          className="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label={`Disable device ${device.name}`}
         >
           Disable

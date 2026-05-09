@@ -4,7 +4,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { DevicesService } from '../src/devices/services/devices.service';
 import { Device } from '../src/devices/models/device.model';
-import { DeviceStatus, DeviceType } from 'src/devices/models/device.enum';
+import { DeviceStatus, DeviceType } from '../src/devices/models/device.enum';
 
 const mockDevice: Device = {
   id: 'uuid-1',
@@ -43,34 +43,70 @@ describe('DevicesService', () => {
   });
 
   describe('createDevice', () => {
-    it('should create and return a device', async () => {
+    it('should create and return a device with OFFLINE status and no lastSeenAt', async () => {
       repo.findOne.mockResolvedValue(null);
       repo.create.mockReturnValue(mockDevice);
       repo.save.mockResolvedValue(mockDevice);
 
-      const result = await service.createDevice({
-        name: 'Test Device',
-        serialNumber: 'ESP32-001',
-        type: DeviceType.ESP32,
-        tenantId: 'tenant-1',
-      });
+      const result = await service.createDevice(
+        {
+          name: 'Test Device',
+          serialNumber: 'ESP32-001',
+          type: DeviceType.ESP32,
+        },
+        'tenant-1',
+      );
 
       expect(result).toEqual(mockDevice);
-      expect(repo.findOne.bind(repo)).toHaveBeenCalledWith({
-        where: { serialNumber: 'ESP32-001' },
-      });
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(repo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Device',
+          serialNumber: 'ESP32-001',
+          type: DeviceType.ESP32,
+          tenantId: 'tenant-1',
+          lastSeenAt: null,
+        }),
+      );
+    });
+
+    it('should set lastSeenAt when creating device with ONLINE status', async () => {
+      const onlineDevice = { ...mockDevice, status: DeviceStatus.ONLINE };
+      repo.findOne.mockResolvedValue(null);
+      repo.create.mockReturnValue(onlineDevice);
+      repo.save.mockResolvedValue(onlineDevice);
+
+      const result = await service.createDevice(
+        {
+          name: 'Online Device',
+          serialNumber: 'ESP32-002',
+          type: DeviceType.ESP32,
+          status: DeviceStatus.ONLINE,
+        },
+        'tenant-1',
+      );
+
+      expect(result.status).toBe(DeviceStatus.ONLINE);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(repo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastSeenAt: expect.any(Date) as Date,
+        }),
+      );
     });
 
     it('should throw ConflictException if serialNumber already exists', async () => {
       repo.findOne.mockResolvedValue(mockDevice);
 
       await expect(
-        service.createDevice({
-          name: 'Other Device',
-          serialNumber: 'ESP32-001',
-          type: DeviceType.ESP32,
-          tenantId: 'tenant-1',
-        }),
+        service.createDevice(
+          {
+            name: 'Other Device',
+            serialNumber: 'ESP32-001',
+            type: DeviceType.ESP32,
+          },
+          'tenant-1',
+        ),
       ).rejects.toThrow(ConflictException);
     });
   });

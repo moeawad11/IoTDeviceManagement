@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
-// Simulates tenant context from a header (in production this would come from a JWT claim)
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {

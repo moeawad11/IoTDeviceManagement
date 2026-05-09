@@ -18,9 +18,9 @@ export class DevicesService {
     private readonly deviceRepository: Repository<Device>,
   ) {}
 
-  async createDevice(dto: CreateDeviceDto): Promise<Device> {
+  async createDevice(dto: CreateDeviceDto, tenantId: string): Promise<Device> {
     const existing = await this.deviceRepository.findOne({
-      where: { serialNumber: dto.serialNumber },
+      where: { serialNumber: dto.serialNumber, tenantId },
     });
     if (existing) {
       throw new ConflictException(
@@ -28,7 +28,11 @@ export class DevicesService {
       );
     }
 
-    const device = this.deviceRepository.create(dto);
+    const device = this.deviceRepository.create({
+      ...dto,
+      tenantId,
+      lastSeenAt: dto.status === DeviceStatus.ONLINE ? new Date() : null,
+    });
     return this.deviceRepository.save(device);
   }
 

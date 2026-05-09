@@ -21,7 +21,7 @@ import { Device } from './devices/models/device.model';
         host: config.get('DB_HOST', 'localhost'),
         port: config.get<number>('DB_PORT', 5432),
         username: config.get('DB_USER', 'postgres'),
-        password: config.get('DB_PASSWORD', 'postgres'),
+        password: config.get('DB_PASSWORD', 'pracpass'),
         database: config.get('DB_NAME', 'iotdb'),
         entities: [Device],
         synchronize: true,
@@ -34,6 +34,9 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(TenantMiddleware)
-      .forRoutes({ path: 'devices*', method: RequestMethod.ALL });
+      .forRoutes(
+        { path: 'devices', method: RequestMethod.ALL },
+        { path: 'devices/*path', method: RequestMethod.ALL },
+      );
   }
 }

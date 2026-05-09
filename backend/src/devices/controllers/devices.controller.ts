@@ -8,8 +8,6 @@ import {
   Param,
   Query,
   Req,
-  HttpCode,
-  HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import {
@@ -39,8 +37,9 @@ export class DevicesController {
   @ApiOperation({ summary: 'Create a new device' })
   @ApiResponse({ status: 201, description: 'Device created' })
   @ApiResponse({ status: 409, description: 'Serial number already exists' })
-  create(@Body() dto: CreateDeviceDto) {
-    return this.devicesService.createDevice(dto);
+  create(@Body() dto: CreateDeviceDto, @Req() req: Request) {
+    const tenantId = req['tenantId'] as string;
+    return this.devicesService.createDevice(dto, tenantId);
   }
 
   @Get()
@@ -74,11 +73,12 @@ export class DevicesController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a device' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+  @ApiResponse({ status: 200, description: 'Device deleted successfully' })
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const tenantId = req['tenantId'] as string;
-    return this.devicesService.deleteDevice(id, tenantId);
+    await this.devicesService.deleteDevice(id, tenantId);
+    return { message: `Device ${id} deleted successfully` };
   }
 }

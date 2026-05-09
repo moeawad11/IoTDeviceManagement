@@ -28,9 +28,4 @@ export class CreateDeviceDto {
   @IsEnum(DeviceStatus)
   @IsOptional()
   status?: DeviceStatus;
-
-  @ApiProperty({ example: 'tenant-uuid-here' })
-  @IsString()
-  @IsNotEmpty()
-  tenantId!: string;
 }

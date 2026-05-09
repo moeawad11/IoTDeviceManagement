@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { Device, DeviceStatus, DevicesResponse } from "../types/device";
+import { API_CONFIG, TENANT_ID_HEADER, DEFAULT_TENANT_ID } from "../constants";
 
 export type {
   DeviceType,
@@ -9,11 +10,11 @@ export type {
 } from "../types/device";
 
 const api = axios.create({
-  baseURL: "/devices",
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
   headers: {
-    "Content-Type": "application/json",
-    // In production this would come from auth context / JWT
-    "x-tenant-id": import.meta.env.VITE_TENANT_ID ?? "tenant-demo",
+    ...API_CONFIG.HEADERS,
+    [TENANT_ID_HEADER]: import.meta.env.VITE_TENANT_ID ?? DEFAULT_TENANT_ID,
   },
 });
 
