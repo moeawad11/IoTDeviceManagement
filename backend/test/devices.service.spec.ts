@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { DevicesService } from '../src/devices/services/devices.service';
-import { Device } from '../src/devices/models/device.model';
-import { DeviceStatus, DeviceType } from '../src/devices/models/device.enum';
+import { DevicesService } from 'src/services/devices.service';
+import { Device } from 'src/models/device.model';
+import { DeviceStatus, DeviceType } from 'src/models/device.enum';
 
 const mockDevice: Device = {
   id: 'uuid-1',

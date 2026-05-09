@@ -88,4 +88,13 @@ export class DevicesService {
     const device = await this.getDevice(id, tenantId);
     await this.deviceRepository.remove(device);
   }
+
+  async findBySerialNumber(
+    serialNumber: string,
+    tenantId: string,
+  ): Promise<Device | null> {
+    return this.deviceRepository.findOne({
+      where: { serialNumber, tenantId },
+    });
+  }
 }

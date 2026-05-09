@@ -6,9 +6,12 @@ import {
 } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DevicesModule } from './devices/devices.module';
-import { TenantMiddleware } from './devices/middleware/tenant.middleware';
-import { Device } from './devices/models/device.model';
+import { DevicesModule } from './devices.module';
+import { MqttModule } from './mqtt.module';
+import { TenantMiddleware } from '../middleware/tenant.middleware';
+import { Device } from '../models/device.model';
+import { AppController } from '../controllers/app.controller';
+import { AppService } from '../services/app.service';
 
 @Module({
   imports: [
@@ -28,7 +31,10 @@ import { Device } from './devices/models/device.model';
       }),
     }),
     DevicesModule,
+    MqttModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

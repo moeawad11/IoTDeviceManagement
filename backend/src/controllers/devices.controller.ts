@@ -18,7 +18,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { DevicesService } from '../services/devices.service';
+import { DevicesService } from 'src/services/devices.service';
 import { CreateDeviceDto } from '../dto/create-device.dto';
 import { UpdateDeviceStatusDto } from '../dto/update-device-status.dto';
 import { GetDevicesQueryDto } from '../dto/get-devices-query.dto';
