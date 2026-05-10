@@ -13,7 +13,7 @@ export function DeviceRow({ device, onView, onDisable, onEnable }: Props) {
     ? new Date(device.lastSeenAt).toLocaleString()
     : "—";
 
-  const isEnabled = device.status === "ONLINE" || device.status === "OFFLINE";
+  const isEnabled = device.status === "ONLINE" || device.status === "ERROR";
 
   return (
     <tr className="border-b hover:bg-gray-50 transition-colors">

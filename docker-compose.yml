@@ -16,31 +16,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mosquitto:
-    image: eclipse-mosquitto:2
-    restart: unless-stopped
-    ports:
-      - "1883:1883"
-    volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mosquitto_pub",
-          "-h",
-          "localhost",
-          "-t",
-          "health",
-          "-m",
-          "ping",
-          "-q",
-          "0",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
@@ -48,8 +23,6 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
-        condition: service_healthy
-      mosquitto:
         condition: service_healthy
     environment:
       DB_HOST: postgres
@@ -59,7 +32,12 @@ services:
       DB_NAME: ${DB_NAME:-iotdb}
       PORT: 3000
       NODE_ENV: production
-      MQTT_BROKER_URL: mqtt://mosquitto:1883
+      AWS_IOT_ENDPOINT: ${AWS_IOT_ENDPOINT}
+      AWS_IOT_KEY_PATH: /certs/private.pem.key
+      AWS_IOT_CERT_PATH: /certs/certificate.pem.crt
+      AWS_IOT_CA_PATH: /certs/AmazonRootCA1.pem
+    volumes:
+      - ./certs:/certs:ro
     ports:
       - "3000:3000"
 

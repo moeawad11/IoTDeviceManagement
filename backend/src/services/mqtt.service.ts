@@ -5,6 +5,7 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import * as mqtt from 'mqtt';
+import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { DevicesService } from './devices.service';
 import { DeviceStatus } from '../models/device.enum';
@@ -32,15 +33,32 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    const brokerUrl = this.config.get<string>(
-      'MQTT_BROKER_URL',
-      'mqtt://localhost:1883',
-    );
+    const endpoint = this.config.get<string>('AWS_IOT_ENDPOINT');
+    const keyPath = this.config.get<string>('AWS_IOT_KEY_PATH');
+    const certPath = this.config.get<string>('AWS_IOT_CERT_PATH');
+    const caPath = this.config.get<string>('AWS_IOT_CA_PATH');
+    const clientId = `iotdevmgmt-backend-${Math.random().toString(16).slice(2, 10)}`;
 
-    this.client = mqtt.connect(brokerUrl);
+    if (!endpoint || !keyPath || !certPath || !caPath) {
+      this.logger.error(
+        'Missing AWS IoT Core configuration. Set AWS_IOT_ENDPOINT, AWS_IOT_KEY_PATH, AWS_IOT_CERT_PATH, AWS_IOT_CA_PATH.',
+      );
+      return;
+    }
+
+    this.client = mqtt.connect(`mqtts://${endpoint}:8883`, {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+      ca: fs.readFileSync(caPath),
+      clientId,
+      protocol: 'mqtts',
+      rejectUnauthorized: true,
+    });
 
     this.client.on('connect', () => {
-      this.logger.log(`Connected to MQTT broker at ${brokerUrl}`);
+      this.logger.log(
+        `Connected to AWS IoT Core at ${endpoint} (clientId: ${clientId})`,
+      );
       this.client.subscribe('devices/+/status', { qos: 1 });
       this.client.subscribe('devices/+/events', { qos: 1 });
       this.client.subscribe('devices/+/heartbeat', { qos: 0 });
