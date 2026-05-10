@@ -15,8 +15,11 @@ export function DeviceTable() {
     limit: 20,
   });
 
-  const { mutate: updateStatus, isPending: isDisabling } =
-    useUpdateDeviceStatus();
+  const { mutate: updateStatus } = useUpdateDeviceStatus();
+
+  const handleEnable = (device: Device) => {
+    updateStatus({ id: device.id, status: "ONLINE" });
+  };
 
   const handleDisable = (device: Device) => {
     updateStatus({ id: device.id, status: "OFFLINE" });
@@ -93,8 +96,8 @@ export function DeviceTable() {
                   key={device.id}
                   device={device}
                   onView={setSelectedDevice}
+                  onEnable={handleEnable}
                   onDisable={handleDisable}
-                  isDisabling={isDisabling}
                 />
               ))}
             </tbody>

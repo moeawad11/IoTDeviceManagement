@@ -4,14 +4,16 @@ import { STATUS_COLORS } from "../../constants";
 interface Props {
   device: Device;
   onView: (device: Device) => void;
+  onEnable: (device: Device) => void;
   onDisable: (device: Device) => void;
-  isDisabling?: boolean;
 }
 
-export function DeviceRow({ device, onView, onDisable, isDisabling }: Props) {
+export function DeviceRow({ device, onView, onDisable, onEnable }: Props) {
   const lastSeen = device.lastSeenAt
     ? new Date(device.lastSeenAt).toLocaleString()
     : "—";
+
+  const isEnabled = device.status === "ONLINE" || device.status === "OFFLINE";
 
   return (
     <tr className="border-b hover:bg-gray-50 transition-colors">
@@ -42,14 +44,23 @@ export function DeviceRow({ device, onView, onDisable, isDisabling }: Props) {
         >
           View
         </button>
-        <button
-          onClick={() => onDisable(device)}
-          disabled={device.status === "OFFLINE" || isDisabling}
-          className="text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-label={`Disable device ${device.name}`}
-        >
-          Disable
-        </button>
+        {isEnabled ? (
+          <button
+            onClick={() => onDisable(device)}
+            className="text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
+            aria-label={`Disable device ${device.name}`}
+          >
+            Disable
+          </button>
+        ) : (
+          <button
+            onClick={() => onEnable(device)}
+            className="text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-green-500 text-green-700 hover:bg-green-50 transition-colors"
+            aria-label={`Enable device ${device.name}`}
+          >
+            Enable
+          </button>
+        )}
       </td>
     </tr>
   );
